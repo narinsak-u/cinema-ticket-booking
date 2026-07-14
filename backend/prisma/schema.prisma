@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bookings  Booking[]
+}
+
+model Movie {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  posterUrl   String
+  duration    Int
+  genre       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  showtimes   Showtime[]
+}
+
+model Showtime {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  movieId   String    @db.ObjectId
+  movie     Movie     @relation(fields: [movieId], references: [id])
+  hall      String
+  startTime DateTime
+  price     Float
+  createdAt DateTime  @default(now())
+  seats     Seat[]
+  bookings  Booking[]
+}
+
+model Seat {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  showtimeId String   @db.ObjectId
+  showtime   Showtime @relation(fields: [showtimeId], references: [id])
+  seatNo     String
+  status     String   @default("AVAILABLE")
+  version    Int      @default(0)
+  createdAt  DateTime @default(now())
+  bookings   Booking[]
+
+  @@unique([showtimeId, seatNo])
+}
+
+model Booking {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  showtimeId String   @db.ObjectId
+  showtime   Showtime @relation(fields: [showtimeId], references: [id])
+  seatId     String   @db.ObjectId
+  seat       Seat     @relation(fields: [seatId], references: [id])
+  status     String   @default("PENDING")
+  lockOwner  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([showtimeId, seatId])
+}
+
+model AuditLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  event     String
+  data      String
+  createdAt DateTime @default(now())
+}
