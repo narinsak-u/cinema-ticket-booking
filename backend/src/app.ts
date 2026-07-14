@@ -31,6 +31,10 @@ import { createSocketServer } from './socket/index.js'
 import { startExpirationWorker } from './queue/worker.js'
 import { connectQueue, createQueueProducer, startConsumers } from './queue/index.js'
 import { createAuditLogRepository } from './repositories/audit-log.repository.js'
+import { createAdminService } from './services/admin.service.js'
+import { createAdminController } from './controllers/admin.controller.js'
+import { createAdminRoutes } from './routes/admin.routes.js'
+import { adminOnly } from './middleware/admin.middleware.js'
 
 export function createApp() {
   const app = express()
@@ -68,6 +72,7 @@ export function createApp() {
   app.use('/api/showtimes', seatRoutes)
 
   const bookingRepo = createBookingRepository(prisma)
+  const auditLogRepo = createAuditLogRepository(prisma)
   const redisLock = createRedisLock(redis, 300)
 
   const httpServer = createServer(app)
@@ -79,6 +84,12 @@ export function createApp() {
 
   app.use('/api/bookings', bookingRoutes)
 
+  const adminService = createAdminService(bookingRepo, auditLogRepo)
+  const adminController = createAdminController(adminService)
+  const adminRoutes = createAdminRoutes(adminController, authMiddleware, adminOnly)
+
+  app.use('/api/admin', adminRoutes)
+
   app.use(errorHandler)
 
   const cleanup = startExpirationWorker(bookingRepo, seatRepo, redisLock, io)
@@ -86,7 +97,6 @@ export function createApp() {
   // ponytail: queue connects asynchronously; failed connection = no audit logging, app still starts
   connectQueue()
     .then(({ channel }) => {
-      const auditLogRepo = createAuditLogRepository(prisma)
       startConsumers(channel, auditLogRepo)
     })
     .catch((err) => console.error('Failed to connect to RabbitMQ:', err))
