@@ -1,4 +1,11 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+
+vi.mock('@prisma/client', () => ({
+  PrismaClient: vi.fn().mockImplementation(() => ({
+    user: { findUnique: vi.fn(), create: vi.fn() },
+  })),
+}))
+
 import { createApp } from './app.js'
 
 describe('createApp', () => {

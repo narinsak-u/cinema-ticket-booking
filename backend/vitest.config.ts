@@ -4,7 +4,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'prisma/**/*.test.ts'],
+    env: {
+      DATABASE_URL: 'mongodb://localhost:27017/test',
+      JWT_SECRET: 'test-secret',
+    },
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
