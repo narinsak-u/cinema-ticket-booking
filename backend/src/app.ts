@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import { createServer } from 'http'
 import { PrismaClient } from '@prisma/client'
 import { errorHandler } from './middleware/error.middleware.js'
 import { createAuthMiddleware } from './middleware/auth.middleware.js'
@@ -26,6 +27,10 @@ import { createBookingRoutes } from './routes/booking.routes.js'
 import { redis } from './redis/client.js'
 import { createRedisLock } from './redis/lock.js'
 import { env } from './config/env.js'
+import { createSocketServer } from './socket/index.js'
+import { startExpirationWorker } from './queue/worker.js'
+import { connectQueue, createQueueProducer, startConsumers } from './queue/index.js'
+import { createAuditLogRepository } from './repositories/audit-log.repository.js'
 
 export function createApp() {
   const app = express()
@@ -64,7 +69,11 @@ export function createApp() {
 
   const bookingRepo = createBookingRepository(prisma)
   const redisLock = createRedisLock(redis, 300)
-  const bookingService = createBookingService(bookingRepo, seatRepo, redisLock)
+
+  const httpServer = createServer(app)
+  const io = createSocketServer(httpServer)
+
+  const bookingService = createBookingService(bookingRepo, seatRepo, redisLock, io)
   const bookingController = createBookingController(bookingService)
   const bookingRoutes = createBookingRoutes(bookingController, authMiddleware)
 
@@ -72,5 +81,15 @@ export function createApp() {
 
   app.use(errorHandler)
 
-  return app
+  const cleanup = startExpirationWorker(bookingRepo, seatRepo, redisLock, io)
+
+  // ponytail: queue connects asynchronously; failed connection = no audit logging, app still starts
+  connectQueue()
+    .then(({ channel }) => {
+      const auditLogRepo = createAuditLogRepository(prisma)
+      startConsumers(channel, auditLogRepo)
+    })
+    .catch((err) => console.error('Failed to connect to RabbitMQ:', err))
+
+  return { app, httpServer, io, cleanup, prisma }
 }

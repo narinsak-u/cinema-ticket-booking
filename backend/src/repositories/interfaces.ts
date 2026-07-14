@@ -26,3 +26,21 @@ export interface ISeatRepository {
   findByShowtime(showtimeId: string): Promise<unknown[]>
   updateStatus(id: string, status: string, version?: number): Promise<unknown | null>
 }
+
+export interface IAuditLogRepository {
+  create(data: { event: string; data: string }): Promise<unknown>
+  findAll(orderBy?: 'asc' | 'desc'): Promise<unknown[]>
+}
+
+export interface IBookingRepository {
+  create(data: {
+    userId: string
+    showtimeId: string
+    seatId: string
+    status: string
+  }): Promise<unknown>
+  findById(id: string): Promise<unknown | null>
+  findByUser(userId: string): Promise<unknown[]>
+  findExpired(before: Date): Promise<unknown[]>
+  updateStatus(id: string, status: string, lockOwner?: string | null): Promise<unknown | null>
+}
