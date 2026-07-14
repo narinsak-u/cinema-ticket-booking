@@ -31,7 +31,7 @@ describe('AuthService', () => {
     expect(result.success).toBe(true)
     expect(result.data).toHaveProperty('token')
     expect(result.data).toHaveProperty('user')
-    expect(result.data.user.email).toBe('test@test.com')
+    expect(result.data!.user.email).toBe('test@test.com')
   })
 
   it('rejects duplicate email', async () => {
