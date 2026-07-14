@@ -19,6 +19,12 @@ import { createSeatRepository } from './repositories/seat.repository.js'
 import { createSeatService } from './services/seat.service.js'
 import { createSeatController } from './controllers/seat.controller.js'
 import { createSeatRoutes } from './routes/seat.routes.js'
+import { createBookingRepository } from './repositories/booking.repository.js'
+import { createBookingService } from './services/booking.service.js'
+import { createBookingController } from './controllers/booking.controller.js'
+import { createBookingRoutes } from './routes/booking.routes.js'
+import { redis } from './redis/client.js'
+import { createRedisLock } from './redis/lock.js'
 import { env } from './config/env.js'
 
 export function createApp() {
@@ -55,6 +61,14 @@ export function createApp() {
 
   app.use('/api/showtimes', showtimeRoutes)
   app.use('/api/showtimes', seatRoutes)
+
+  const bookingRepo = createBookingRepository(prisma)
+  const redisLock = createRedisLock(redis, 300)
+  const bookingService = createBookingService(bookingRepo, seatRepo, redisLock)
+  const bookingController = createBookingController(bookingService)
+  const bookingRoutes = createBookingRoutes(bookingController, authMiddleware)
+
+  app.use('/api/bookings', bookingRoutes)
 
   app.use(errorHandler)
 
