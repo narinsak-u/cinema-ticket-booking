@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { broadcastSeatLocked, broadcastSeatReleased, broadcastSeatBooked } from './handlers.js'
+import { broadcastSeatLocked, broadcastSeatReleased, broadcastSeatBooked } from '../socket/handlers.js'
 
 describe('Socket broadcast helpers', () => {
   it('broadcastSeatLocked emits to showtime room', () => {

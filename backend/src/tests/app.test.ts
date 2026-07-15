@@ -24,7 +24,7 @@ vi.mock('socket.io', () => ({
   })),
 }))
 
-import { createApp } from './app.js'
+import { createApp } from '../app.js'
 
 describe('createApp', () => {
   it('creates app with Express, Socket.IO, and worker', () => {

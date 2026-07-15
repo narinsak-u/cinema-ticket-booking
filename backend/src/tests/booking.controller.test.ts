@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
-import type { Request, Response } from 'express'
-import { createBookingController } from './booking.controller.js'
+import type { Response } from 'express'
+import { createBookingController } from '../controllers/booking.controller.js'
 
 describe('BookingController', () => {
   const mockService = { create: vi.fn(), payment: vi.fn() }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createRedisLock } from './lock.js'
+import { createRedisLock } from '../redis/lock.js'
 
 describe('RedisLock', () => {
   const mockRedis = {

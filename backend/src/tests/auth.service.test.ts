@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { IUserRepository } from '../repositories/interfaces.js'
-import { createAuthService } from './auth.service.js'
+import { createAuthService } from '../services/auth.service.js'
 
 describe('AuthService', () => {
   const mockRepo: IUserRepository = {

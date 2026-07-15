@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createShowtimeService } from './showtime.service.js'
+import { createShowtimeService } from '../services/showtime.service.js'
 
 describe('ShowtimeService', () => {
   const mockRepo = { findAll: vi.fn(), findById: vi.fn() }

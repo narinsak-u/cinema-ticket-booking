@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createMovieService } from './movie.service.js'
+import { createMovieService } from '../services/movie.service.js'
 
 describe('MovieService', () => {
   const mockRepo = { findAll: vi.fn(), findById: vi.fn() }

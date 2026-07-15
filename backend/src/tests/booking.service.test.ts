@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createBookingService } from './booking.service.js'
+import { createBookingService } from '../services/booking.service.js'
 
 describe('BookingService', () => {
   const mockBookingRepo = {

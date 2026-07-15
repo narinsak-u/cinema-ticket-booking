@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { createAuthMiddleware } from './auth.middleware.js'
+import { createAuthMiddleware } from '../middleware/auth.middleware.js'
 
 describe('authMiddleware', () => {
   const middleware = createAuthMiddleware('test-secret')

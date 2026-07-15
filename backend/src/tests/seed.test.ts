@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createShowtimeSeats } from './seed.js'
+import { createShowtimeSeats } from '../../prisma/seed.js'
 
 describe('createShowtimeSeats', () => {
   it('generates seat labels for a 5x8 hall', () => {

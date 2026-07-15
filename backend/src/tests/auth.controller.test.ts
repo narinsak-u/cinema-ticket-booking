@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { Request, Response } from 'express'
-import { createAuthController } from './auth.controller.js'
+import { createAuthController } from '../controllers/auth.controller.js'
 
 describe('AuthController', () => {
   const mockService = {

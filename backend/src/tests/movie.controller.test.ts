@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { Request, Response } from 'express'
-import { createMovieController } from './movie.controller.js'
+import { createMovieController } from '../controllers/movie.controller.js'
 
 describe('MovieController', () => {
   const mockService = { getAll: vi.fn(), getById: vi.fn() }

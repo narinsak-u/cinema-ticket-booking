@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createAdminService } from './admin.service.js'
+import { createAdminService } from '../services/admin.service.js'
 
 describe('AdminService', () => {
   const mockBookingRepo = {

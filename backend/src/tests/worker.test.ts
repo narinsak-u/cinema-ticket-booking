@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { startExpirationWorker } from './worker.js'
+import { startExpirationWorker } from '../queue/worker.js'
 
 describe('ExpirationWorker', () => {
   afterEach(() => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createQueueProducer } from './producer.js'
+import { createQueueProducer } from '../queue/producer.js'
 
 describe('QueueProducer', () => {
   it('publishes message to booking.events exchange', () => {

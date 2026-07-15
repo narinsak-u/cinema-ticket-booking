@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['src/**/*.test.ts', 'prisma/**/*.test.ts'],
+    include: ['src/tests/**/*.test.ts'],
     env: {
       DATABASE_URL: 'mongodb://localhost:27017/test',
       JWT_SECRET: 'test-secret',
