@@ -1,6 +1,7 @@
 import type { IBookingRepository } from '../repositories/booking.repository.js'
 import type { ISeatRepository } from '../repositories/seat.repository.js'
 import type { Server } from 'socket.io'
+import { broadcastSeatLocked, broadcastSeatBooked } from '../socket/handlers.js'
 
 export function createBookingService(
   bookingRepo: IBookingRepository,
@@ -33,7 +34,7 @@ export function createBookingService(
       await seatRepo.updateStatus(seat.id, 'LOCKED')
 
       if (io) {
-        io.to(data.showtimeId).emit('seat:locked', { showtimeId: data.showtimeId, seatNo: data.seatNo, userId: data.userId })
+        broadcastSeatLocked(io, data.showtimeId, data.seatNo, data.userId)
       }
 
       return { success: true as const, data: booking }
@@ -49,7 +50,7 @@ export function createBookingService(
       await seatRepo.updateStatus(booking.seatId, 'BOOKED')
 
       if (io) {
-        io.to(booking.showtimeId).emit('seat:booked', { showtimeId: booking.showtimeId, seatNo: booking.seat.seatNo, userId })
+        broadcastSeatBooked(io, booking.showtimeId, booking.seat.seatNo, userId)
       }
 
       if (redisLock) {
