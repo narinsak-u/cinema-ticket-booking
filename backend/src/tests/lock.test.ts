@@ -7,6 +7,7 @@ describe('RedisLock', () => {
     get: vi.fn(),
     del: vi.fn(),
     expire: vi.fn(),
+    eval: vi.fn(),
   }
   const lock = createRedisLock(mockRedis as any, 300)
 
@@ -28,16 +29,14 @@ describe('RedisLock', () => {
   })
 
   it('releases lock only for the owner', async () => {
-    vi.mocked(mockRedis.get).mockResolvedValue('owner-1')
-    vi.mocked(mockRedis.del).mockResolvedValue(1)
+    vi.mocked(mockRedis.eval).mockResolvedValue(1)
     const result = await lock.release('seat_lock:1:A1', 'owner-1')
     expect(result).toBe(true)
   })
 
   it('refuses release for wrong owner', async () => {
-    vi.mocked(mockRedis.get).mockResolvedValue('owner-1')
+    vi.mocked(mockRedis.eval).mockResolvedValue(0)
     const result = await lock.release('seat_lock:1:A1', 'owner-2')
     expect(result).toBe(false)
-    expect(mockRedis.del).not.toHaveBeenCalled()
   })
 })

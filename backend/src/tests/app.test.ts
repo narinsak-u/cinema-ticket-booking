@@ -7,7 +7,7 @@ vi.mock('@prisma/client', () => ({
 }))
 
 vi.mock('ioredis', () => {
-  const mk = () => ({ set: vi.fn(), get: vi.fn(), del: vi.fn(), expire: vi.fn(), on: vi.fn() })
+  const mk = () => ({ set: vi.fn(), get: vi.fn(), del: vi.fn(), expire: vi.fn(), eval: vi.fn(), on: vi.fn() })
   return { default: vi.fn(mk), Redis: vi.fn(mk) }
 })
 

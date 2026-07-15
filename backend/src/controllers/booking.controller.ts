@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { createBookingSchema, paymentSchema } from '../lib/validation.js'
 
 export function createBookingController(bookingService: {
   create: (data: { userId: string; showtimeId: string; seatNo: string }) => Promise<{ success: boolean; data?: any; error?: string }>
@@ -6,15 +7,24 @@ export function createBookingController(bookingService: {
 }) {
   return {
     async create(req: Request, res: Response) {
+      const parsed = createBookingSchema.safeParse(req.body)
+      if (!parsed.success) {
+        res.status(400).json({ success: false, error: parsed.error.errors[0].message })
+        return
+      }
       const result = await bookingService.create({
         userId: req.user!.id,
-        showtimeId: req.body.showtimeId,
-        seatNo: req.body.seatNo,
+        ...parsed.data,
       })
       res.json(result)
     },
     async payment(req: Request, res: Response) {
-      const result = await bookingService.payment(req.body.bookingId, req.user!.id)
+      const parsed = paymentSchema.safeParse(req.body)
+      if (!parsed.success) {
+        res.status(400).json({ success: false, error: parsed.error.errors[0].message })
+        return
+      }
+      const result = await bookingService.payment(parsed.data.bookingId, req.user!.id)
       res.json(result)
     },
   }

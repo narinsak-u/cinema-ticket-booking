@@ -8,7 +8,7 @@ describe('BookingController', () => {
 
   it('calls service.create with user id', async () => {
     const req = { user: { id: 'user-1' }, body: { showtimeId: 's1', seatNo: 'A1' } } as any
-    const res = { json: vi.fn() } as unknown as Response
+    const res = { json: vi.fn(), status: vi.fn().mockReturnThis() } as unknown as Response
     mockService.create.mockResolvedValue({ success: true, data: {} })
 
     await controller.create(req, res)

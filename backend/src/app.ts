@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 import { createServer } from 'http'
 import { PrismaClient } from '@prisma/client'
 import { errorHandler } from './middleware/error.middleware.js'
@@ -29,7 +31,7 @@ import { createRedisLock } from './redis/lock.js'
 import { env } from './config/env.js'
 import { createSocketServer } from './socket/index.js'
 import { startExpirationWorker } from './queue/worker.js'
-import { connectQueue, createQueueProducer, startConsumers } from './queue/index.js'
+import { connectQueue, startConsumers } from './queue/index.js'
 import { createAuditLogRepository } from './repositories/audit-log.repository.js'
 import { createAdminService } from './services/admin.service.js'
 import { createAdminController } from './controllers/admin.controller.js'
@@ -39,8 +41,12 @@ import { adminOnly } from './middleware/admin.middleware.js'
 export function createApp() {
   const app = express()
 
-  app.use(cors())
+  app.use(cors({ origin: env.CORS_ORIGIN }))
+  app.use(helmet())
   app.use(express.json())
+
+  const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 })
+  app.use('/api/auth', limiter)
 
   const prisma = new PrismaClient()
   const authMiddleware = createAuthMiddleware(env.JWT_SECRET)
