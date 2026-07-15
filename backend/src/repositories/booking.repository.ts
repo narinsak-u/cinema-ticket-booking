@@ -2,7 +2,6 @@ import type { PrismaClient, Prisma, Booking } from '@prisma/client'
 
 export type BookingWithSeat = Prisma.BookingGetPayload<{ include: { seat: true } }>
 export type BookingWithSeatShowtime = Prisma.BookingGetPayload<{ include: { seat: true; showtime: true } }>
-export type BookingWithSeatShowtimeUser = Prisma.BookingGetPayload<{ include: { seat: true; showtime: true; user: true } }>
 export type BookingWithSeatShowtimeMovie = Prisma.BookingGetPayload<{ include: { seat: true; showtime: { include: { movie: true } } } }>
 
 /** Repository interface for booking data access. */
@@ -13,7 +12,7 @@ export interface IBookingRepository {
     seatId: string
     status: string
   }): Promise<BookingWithSeatShowtime>
-  findById(id: string): Promise<BookingWithSeatShowtimeUser | null>
+  findById(id: string): Promise<BookingWithSeat | null>
   findByUser(userId: string): Promise<BookingWithSeatShowtimeMovie[]>
   findExpired(before: Date): Promise<BookingWithSeat[]>
   updateStatus(id: string, status: string, lockOwner?: string | null): Promise<Booking | null>
@@ -33,7 +32,7 @@ export function createBookingRepository(prisma: PrismaClient): IBookingRepositor
     async findById(id: string) {
       return prisma.booking.findUnique({
         where: { id },
-        include: { seat: true, showtime: true, user: true },
+        include: { seat: true },
       })
     },
     async findByUser(userId: string) {
