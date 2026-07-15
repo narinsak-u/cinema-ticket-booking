@@ -1,6 +1,10 @@
 import type { Request, Response } from 'express'
 import type { IMovieRepository } from '../repositories/movie.repository.js'
 
+/**
+ * Creates controller handlers for movie endpoints.
+ * Handles listing all movies and fetching a movie by ID with optional pagination.
+ */
 export function createMovieController(movieRepo: IMovieRepository) {
   return {
     async getAll(req: Request, res: Response) {

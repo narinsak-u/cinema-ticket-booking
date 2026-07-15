@@ -6,6 +6,11 @@ import { broadcastSeatReleased } from "../socket/handlers.js";
 const LOCK_TTL_SECONDS = 300;
 const INTERVAL_MS = 30_000;
 
+/**
+ * Starts a periodic timer that finds PENDING bookings older than the Redis lock TTL
+ * and marks them EXPIRED, releases the Redis lock, and broadcasts seat release via Socket.IO.
+ * @returns A cleanup function that clears the interval.
+ */
 export function startExpirationWorker(
   bookingRepo: IBookingRepository,
   _seatRepo: ISeatRepository,

@@ -1,6 +1,10 @@
 import type { Request, Response } from 'express'
 import type { IShowtimeRepository } from '../repositories/showtime.repository.js'
 
+/**
+ * Creates controller handlers for showtime endpoints.
+ * Handles listing all showtimes and fetching a showtime by ID with optional pagination.
+ */
 export function createShowtimeController(showtimeRepo: IShowtimeRepository) {
   return {
     async getAll(req: Request, res: Response) {

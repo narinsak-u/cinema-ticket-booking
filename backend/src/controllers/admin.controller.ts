@@ -1,6 +1,10 @@
 import type { Request, Response } from "express";
 import type { ApiResponse } from "../lib/response.js";
 
+/**
+ * Creates controller handlers for admin endpoints.
+ * Handles listing all bookings with optional filters and fetching audit logs.
+ */
 export function createAdminController(adminService: {
   getBookings: (filters: {
     movieId?: string;

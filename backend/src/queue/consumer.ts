@@ -1,6 +1,11 @@
 import type { Channel } from 'amqplib'
 import type { IAuditLogRepository } from '../repositories/audit-log.repository.js'
 
+/**
+ * Starts consuming `booking.*` events from the `booking.audit` queue.
+ * Each message is persisted as an audit log entry via the repository.
+ * Unprocessable messages are nacked and discarded.
+ */
 export async function startConsumers(channel: Channel, auditLogRepo: IAuditLogRepository) {
   const { queue } = await channel.assertQueue('booking.audit', { durable: true })
   await channel.bindQueue(queue, 'booking.events', 'booking.*')

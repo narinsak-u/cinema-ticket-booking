@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import type { IUserRepository } from '../repositories/user.repository.js'
 
+/** Shape returned by auth operations on success. */
 export interface AuthResult {
   token: string
   user: {
@@ -12,6 +13,11 @@ export interface AuthResult {
   }
 }
 
+/**
+ * Creates auth service with register, login, and getMe operations.
+ * Passwords are hashed with bcrypt; tokens are JWTs lasting 7 days.
+ * Returns ApiResponse with success flag and error message on failure.
+ */
 export function createAuthService(userRepo: IUserRepository, jwtSecret: string) {
   return {
     async register(data: { email: string; password: string; name: string }) {

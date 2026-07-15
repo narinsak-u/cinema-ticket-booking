@@ -6,6 +6,11 @@ import {
   broadcastSeatBooked,
 } from "../socket/handlers.js";
 
+/**
+ * Creates booking service with create and payment operations.
+ * Uses a Redis distributed lock to prevent double-booking and broadcasts
+ * real-time seat status changes via Socket.IO.
+ */
 export function createBookingService(
   bookingRepo: IBookingRepository,
   seatRepo: ISeatRepository,

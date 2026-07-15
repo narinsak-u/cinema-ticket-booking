@@ -6,6 +6,7 @@ import {
 } from "express";
 import type { createAdminController } from "../controllers/admin.controller.js";
 
+/** Creates admin routes: GET /bookings, GET /logs (auth + admin-only). */
 export function createAdminRoutes(
   controller: ReturnType<typeof createAdminController>,
   authMiddleware: (req: Request, res: Response, next: NextFunction) => void,

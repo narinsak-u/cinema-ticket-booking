@@ -1,8 +1,14 @@
 import { Redis } from 'ioredis'
 import { env } from '../config/env.js'
 
+/** Shared Redis connection used across the app. */
 export const redis = new Redis(env.REDIS_URL)
 
+/**
+ * Creates a distributed lock backed by Redis SET NX EX.
+ * Used to prevent concurrent seat booking.
+ * @param ttlSeconds - Lock TTL; expires automatically if not released (default 300)
+ */
 export function createRedisLock(redis: Redis, ttlSeconds: number) {
   return {
     async acquire(key: string, owner: string): Promise<boolean> {

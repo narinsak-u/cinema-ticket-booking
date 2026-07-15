@@ -2,6 +2,10 @@ import type { Request, Response } from "express";
 import type { ApiResponse } from "../lib/response.js";
 import { createBookingSchema, paymentSchema } from "../lib/validation.js";
 
+/**
+ * Creates controller handlers for booking endpoints.
+ * Handles booking creation and payment with request validation.
+ */
 export function createBookingController(bookingService: {
   create: (data: {
     userId: string;

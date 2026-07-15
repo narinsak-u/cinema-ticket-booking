@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
+/** Shape of the JWT payload attached to the request by the auth middleware. */
 export interface JwtPayload {
   id: string
   role: string
@@ -14,6 +15,11 @@ declare global {
   }
 }
 
+/**
+ * Creates Express middleware that validates Bearer JWTs.
+ * Attaches decoded payload to `req.user` on success.
+ * Returns 401 with `No token provided` or `Invalid token` on failure.
+ */
 export function createAuthMiddleware(secret: string) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const header = req.headers.authorization

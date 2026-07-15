@@ -1,6 +1,10 @@
 import type { IBookingRepository } from "../repositories/booking.repository.js";
 import type { IAuditLogRepository } from "../repositories/audit-log.repository.js";
 
+/**
+ * Creates admin service with booking listing and audit log retrieval.
+ * Filters bookings client-side by movieId and date (ponytail: simple at current scale).
+ */
 export function createAdminService(
   bookingRepo: IBookingRepository,
   auditLogRepo: IAuditLogRepository,

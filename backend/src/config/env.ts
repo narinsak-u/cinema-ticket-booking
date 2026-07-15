@@ -1,5 +1,9 @@
 import 'dotenv/config'
 
+/**
+ * Runtime configuration loaded from environment variables.
+ * All values fall back to local-development defaults.
+ */
 export const env = {
   PORT: Number(process.env.PORT) || 3000,
   DATABASE_URL: process.env.DATABASE_URL ?? 'mongodb://localhost:27017/cinema_booking',

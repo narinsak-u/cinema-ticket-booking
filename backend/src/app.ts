@@ -35,6 +35,12 @@ import { createAdminController } from './controllers/admin.controller.js'
 import { createAdminRoutes } from './routes/admin.routes.js'
 import { adminOnly } from './middleware/admin.middleware.js'
 
+/**
+ * Creates an Express app with all middleware and routes wired.
+ * Sets up CORS, security headers, rate limiting, Socket.IO, Redis lock,
+ * RabbitMQ consumer, and the lock-expiration worker.
+ * Returns the HTTP server, Socket.IO instance, cleanup function, and Prisma client.
+ */
 export function createApp() {
   const app = express()
 

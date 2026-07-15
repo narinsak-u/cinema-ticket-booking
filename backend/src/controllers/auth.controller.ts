@@ -2,6 +2,10 @@ import type { Request, Response } from "express";
 import type { ApiResponse } from "../lib/response.js";
 import { registerSchema, loginSchema } from "../lib/validation.js";
 
+/**
+ * Creates controller handlers for authentication endpoints.
+ * Handles register, login, and get-me operations with request validation.
+ */
 export function createAuthController(authService: {
   register: (data: {
     email: string;

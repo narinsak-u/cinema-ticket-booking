@@ -1,10 +1,14 @@
 import type { PrismaClient, Movie } from '@prisma/client'
 
+/** Repository interface for movie data access. */
 export interface IMovieRepository {
   findAll(limit?: number, offset?: number): Promise<Movie[]>
   findById(id: string): Promise<Movie | null>
 }
 
+/**
+ * Creates a movie repository backed by Prisma.
+ */
 export function createMovieRepository(prisma: PrismaClient): IMovieRepository {
   return {
     async findAll(limit = 50, offset = 0): Promise<Movie[]> {

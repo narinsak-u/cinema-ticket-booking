@@ -6,6 +6,7 @@ import {
 } from "express";
 import type { createSeatController } from "../controllers/seat.controller.js";
 
+/** Creates seat routes: GET /:showtimeId/seats (auth required). */
 export function createSeatRoutes(
   controller: ReturnType<typeof createSeatController>,
   authMiddleware: (req: Request, res: Response, next: NextFunction) => void,

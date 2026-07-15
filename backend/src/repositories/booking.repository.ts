@@ -5,6 +5,7 @@ export type BookingWithSeatShowtime = Prisma.BookingGetPayload<{ include: { seat
 export type BookingWithSeatShowtimeUser = Prisma.BookingGetPayload<{ include: { seat: true; showtime: true; user: true } }>
 export type BookingWithSeatShowtimeMovie = Prisma.BookingGetPayload<{ include: { seat: true; showtime: { include: { movie: true } } } }>
 
+/** Repository interface for booking data access. */
 export interface IBookingRepository {
   create(data: {
     userId: string
@@ -18,6 +19,9 @@ export interface IBookingRepository {
   updateStatus(id: string, status: string, lockOwner?: string | null): Promise<Booking | null>
 }
 
+/**
+ * Creates a booking repository backed by Prisma.
+ */
 export function createBookingRepository(prisma: PrismaClient): IBookingRepository {
   return {
     async create(data) {

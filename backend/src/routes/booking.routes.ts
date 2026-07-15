@@ -6,6 +6,7 @@ import {
 } from "express";
 import type { createBookingController } from "../controllers/booking.controller.js";
 
+/** Creates booking routes: POST /, POST /payment (both auth required). */
 export function createBookingRoutes(
   controller: ReturnType<typeof createBookingController>,
   authMiddleware: (req: Request, res: Response, next: NextFunction) => void,
