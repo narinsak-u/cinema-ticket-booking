@@ -9,29 +9,26 @@ import { createAuthMiddleware } from './middleware/auth.middleware.js'
 import { createUserRepository } from './repositories/user.repository.js'
 import { createMovieRepository } from './repositories/movie.repository.js'
 import { createAuthService } from './services/auth.service.js'
-import { createMovieService } from './services/movie.service.js'
 import { createAuthController } from './controllers/auth.controller.js'
 import { createMovieController } from './controllers/movie.controller.js'
 import { createAuthRoutes } from './routes/auth.routes.js'
 import { createMovieRoutes } from './routes/movie.routes.js'
 import { createShowtimeRepository } from './repositories/showtime.repository.js'
-import { createShowtimeService } from './services/showtime.service.js'
 import { createShowtimeController } from './controllers/showtime.controller.js'
 import { createShowtimeRoutes } from './routes/showtime.routes.js'
 import { createSeatRepository } from './repositories/seat.repository.js'
-import { createSeatService } from './services/seat.service.js'
 import { createSeatController } from './controllers/seat.controller.js'
 import { createSeatRoutes } from './routes/seat.routes.js'
 import { createBookingRepository } from './repositories/booking.repository.js'
 import { createBookingService } from './services/booking.service.js'
 import { createBookingController } from './controllers/booking.controller.js'
 import { createBookingRoutes } from './routes/booking.routes.js'
-import { redis } from './redis/client.js'
-import { createRedisLock } from './redis/lock.js'
+import { redis, createRedisLock } from './redis/client.js'
 import { env } from './config/env.js'
 import { createSocketServer } from './socket/index.js'
 import { startExpirationWorker } from './queue/worker.js'
-import { connectQueue, startConsumers } from './queue/index.js'
+import { connectQueue } from './queue/client.js'
+import { startConsumers } from './queue/consumer.js'
 import { createAuditLogRepository } from './repositories/audit-log.repository.js'
 import { createAdminService } from './services/admin.service.js'
 import { createAdminController } from './controllers/admin.controller.js'
@@ -58,20 +55,17 @@ export function createApp() {
   app.use('/api/auth', authRoutes)
 
   const movieRepo = createMovieRepository(prisma)
-  const movieService = createMovieService(movieRepo)
-  const movieController = createMovieController(movieService)
+  const movieController = createMovieController(movieRepo)
   const movieRoutes = createMovieRoutes(movieController)
 
   app.use('/api/movies', movieRoutes)
 
   const showtimeRepo = createShowtimeRepository(prisma)
-  const showtimeService = createShowtimeService(showtimeRepo)
-  const showtimeController = createShowtimeController(showtimeService)
+  const showtimeController = createShowtimeController(showtimeRepo)
   const showtimeRoutes = createShowtimeRoutes(showtimeController)
 
   const seatRepo = createSeatRepository(prisma)
-  const seatService = createSeatService(seatRepo)
-  const seatController = createSeatController(seatService)
+  const seatController = createSeatController(seatRepo)
   const seatRoutes = createSeatRoutes(seatController, authMiddleware)
 
   app.use('/api/showtimes', showtimeRoutes)

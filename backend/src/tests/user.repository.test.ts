@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import type { IUserRepository } from '../repositories/interfaces.js'
+import type { IUserRepository } from '../repositories/user.repository.js'
 
 describe('IUserRepository', () => {
   it('defines the contract', () => {

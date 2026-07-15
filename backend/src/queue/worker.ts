@@ -1,5 +1,6 @@
 import type { Server } from 'socket.io'
-import type { IBookingRepository, ISeatRepository } from '../repositories/interfaces.js'
+import type { IBookingRepository } from '../repositories/booking.repository.js'
+import type { ISeatRepository } from '../repositories/seat.repository.js'
 import { broadcastSeatReleased } from '../socket/handlers.js'
 
 const LOCK_TTL_SECONDS = 300

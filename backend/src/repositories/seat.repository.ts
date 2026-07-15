@@ -1,5 +1,9 @@
 import type { PrismaClient } from '@prisma/client'
-import type { ISeatRepository } from './interfaces.js'
+
+export interface ISeatRepository {
+  findByShowtime(showtimeId: string): Promise<unknown[]>
+  updateStatus(id: string, status: string): Promise<unknown | null>
+}
 
 export function createSeatRepository(prisma: PrismaClient): ISeatRepository {
   return {

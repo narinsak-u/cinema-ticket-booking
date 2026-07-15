@@ -12,14 +12,6 @@ export function createSocketHandlers(io: Server) {
   })
 }
 
-export function broadcastSeatLocked(io: Server, showtimeId: string, seatNo: string, userId: string) {
-  io.to(showtimeId).emit('seat:locked', { showtimeId, seatNo, userId })
-}
-
 export function broadcastSeatReleased(io: Server, showtimeId: string, seatNo: string) {
   io.to(showtimeId).emit('seat:released', { showtimeId, seatNo })
-}
-
-export function broadcastSeatBooked(io: Server, showtimeId: string, seatNo: string, userId: string) {
-  io.to(showtimeId).emit('seat:booked', { showtimeId, seatNo, userId })
 }

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import type { IUserRepository } from '../repositories/interfaces.js'
+import type { IUserRepository } from '../repositories/user.repository.js'
 
 export interface AuthResult {
   token: string

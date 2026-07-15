@@ -1,12 +1,11 @@
 import type { Request, Response } from 'express'
+import type { ISeatRepository } from '../repositories/seat.repository.js'
 
-export function createSeatController(seatService: {
-  getSeatMap: (showtimeId: string) => Promise<{ success: boolean; data?: any; error?: string }>
-}) {
+export function createSeatController(seatRepo: ISeatRepository) {
   return {
     async getSeatMap(req: Request, res: Response) {
-      const result = await seatService.getSeatMap(req.params.showtimeId as string)
-      res.json(result)
+      const seats = await seatRepo.findByShowtime(req.params.showtimeId as string)
+      res.json({ success: true, data: seats })
     },
   }
 }

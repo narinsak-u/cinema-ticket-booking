@@ -3,13 +3,13 @@ import type { Request, Response } from 'express'
 import { createMovieController } from '../controllers/movie.controller.js'
 
 describe('MovieController', () => {
-  const mockService = { getAll: vi.fn(), getById: vi.fn() }
-  const controller = createMovieController(mockService as any)
+  const mockRepo = { findAll: vi.fn(), findById: vi.fn() }
+  const controller = createMovieController(mockRepo as any)
 
   it('lists all movies', async () => {
     const req = {} as Request
     const res = { json: vi.fn() } as unknown as Response
-    mockService.getAll.mockResolvedValue({ success: true, data: [] })
+    mockRepo.findAll.mockResolvedValue([])
     await controller.getAll(req, res)
     expect(res.json).toHaveBeenCalledWith({ success: true, data: [] })
   })

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { IUserRepository } from '../repositories/interfaces.js'
+import type { IUserRepository } from '../repositories/user.repository.js'
 import { createAuthService } from '../services/auth.service.js'
 
 describe('AuthService', () => {

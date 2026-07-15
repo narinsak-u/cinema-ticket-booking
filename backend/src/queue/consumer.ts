@@ -1,5 +1,5 @@
 import type { Channel } from 'amqplib'
-import type { IAuditLogRepository } from '../repositories/interfaces.js'
+import type { IAuditLogRepository } from '../repositories/audit-log.repository.js'
 
 export async function startConsumers(channel: Channel, auditLogRepo: IAuditLogRepository) {
   const { queue } = await channel.assertQueue('booking.audit', { durable: true })

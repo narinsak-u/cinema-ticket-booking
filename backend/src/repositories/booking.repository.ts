@@ -1,5 +1,17 @@
 import type { PrismaClient } from '@prisma/client'
-import type { IBookingRepository } from './interfaces.js'
+
+export interface IBookingRepository {
+  create(data: {
+    userId: string
+    showtimeId: string
+    seatId: string
+    status: string
+  }): Promise<unknown>
+  findById(id: string): Promise<unknown | null>
+  findByUser(userId: string): Promise<unknown[]>
+  findExpired(before: Date): Promise<unknown[]>
+  updateStatus(id: string, status: string, lockOwner?: string | null): Promise<unknown | null>
+}
 
 export function createBookingRepository(prisma: PrismaClient): IBookingRepository {
   return {

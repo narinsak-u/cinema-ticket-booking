@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import type { IMovieRepository } from '../repositories/interfaces.js'
+import type { IMovieRepository } from '../repositories/movie.repository.js'
 
 describe('IMovieRepository', () => {
   it('defines the contract', () => {
