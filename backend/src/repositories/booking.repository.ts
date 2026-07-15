@@ -1,22 +1,7 @@
-import type { PrismaClient, Prisma, Booking } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
+import type { IBookingRepository, BookingWithSeat, BookingWithSeatShowtime, BookingWithSeatShowtimeMovie } from './interfaces.js'
 
-export type BookingWithSeat = Prisma.BookingGetPayload<{ include: { seat: true } }>
-export type BookingWithSeatShowtime = Prisma.BookingGetPayload<{ include: { seat: true; showtime: true } }>
-export type BookingWithSeatShowtimeMovie = Prisma.BookingGetPayload<{ include: { seat: true; showtime: { include: { movie: true } } } }>
-
-/** Repository interface for booking data access. */
-export interface IBookingRepository {
-  create(data: {
-    userId: string
-    showtimeId: string
-    seatId: string
-    status: string
-  }): Promise<BookingWithSeatShowtime>
-  findById(id: string): Promise<BookingWithSeat | null>
-  findByUser(userId: string): Promise<BookingWithSeatShowtimeMovie[]>
-  findExpired(before: Date): Promise<BookingWithSeat[]>
-  updateStatus(id: string, status: string, lockOwner?: string | null): Promise<Booking | null>
-}
+export type { IBookingRepository, BookingWithSeat, BookingWithSeatShowtime, BookingWithSeatShowtimeMovie }
 
 /**
  * Creates a booking repository backed by Prisma.

@@ -1,10 +1,7 @@
-import type { PrismaClient, Seat } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
+import type { ISeatRepository } from './interfaces.js'
 
-/** Repository interface for seat data access. */
-export interface ISeatRepository {
-  findByShowtime(showtimeId: string): Promise<Seat[]>
-  updateStatus(id: string, status: string): Promise<Seat | null>
-}
+export type { ISeatRepository }
 
 /**
  * Creates a seat repository backed by Prisma.

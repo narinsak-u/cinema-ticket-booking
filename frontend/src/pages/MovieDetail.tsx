@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api } from '../lib/api.js'
+import type { Movie, Showtime } from '../stores/movie.store.js'
 
 export function MovieDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [movie, setMovie] = useState<any>(null)
-  const [showtimes, setShowtimes] = useState<any[]>([])
+  const [movie, setMovie] = useState<Movie | null>(null)
+  const [showtimes, setShowtimes] = useState<Showtime[]>([])
 
   useEffect(() => {
     api.get(`/movies/${id}`).then((res) => {
@@ -14,7 +15,7 @@ export function MovieDetail() {
     })
     api.get('/showtimes').then((res) => {
       if (res.data.success) {
-        const filtered = res.data.data.filter((s: any) => s.movieId === id)
+        const filtered = res.data.data.filter((s: Showtime) => s.movieId === id)
         setShowtimes(filtered)
       }
     })

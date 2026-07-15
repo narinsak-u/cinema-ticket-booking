@@ -1,24 +1,12 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api } from '../lib/api.js'
+import { useMovies } from '../hooks/useMovies.js'
 import { MovieCard } from '../components/MovieCard.js'
 
-interface Movie {
-  id: string
-  title: string
-  description: string
-  genre: string
-}
-
 export function Home() {
-  const [movies, setMovies] = useState<Movie[]>([])
+  const { movies, loading } = useMovies()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    api.get('/movies').then((res) => {
-      if (res.data.success) setMovies(res.data.data)
-    })
-  }, [])
+  if (loading) return <div style={{ padding: 24 }}>Loading...</div>
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 24 }}>

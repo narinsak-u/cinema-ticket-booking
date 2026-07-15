@@ -1,18 +1,7 @@
 import type { PrismaClient, User } from '@prisma/client'
+import type { CreateUserData, IUserRepository } from './interfaces.js'
 
-/** Data required to create a new user. */
-export interface CreateUserData {
-  email: string
-  password: string
-  name: string
-}
-
-/** Repository interface for user data access. */
-export interface IUserRepository {
-  findByEmail(email: string): Promise<User | null>
-  findById(id: string): Promise<User | null>
-  create(data: CreateUserData): Promise<User>
-}
+export type { CreateUserData, IUserRepository }
 
 /**
  * Creates a user repository backed by Prisma.

@@ -29,26 +29,27 @@ backend infrastructure processes.
 ## System Architecture
 
 ```
-┌─────────────┐     ┌──────────────────────────────────────────┐
-│   Frontend   │────▶│                 Backend                   │
-│  React 19    │◀────│           Express 5 + Socket.IO          │
-│  Vite 8      │     │                                          │
-└─────────────┘     └──────┬───────────┬───────────┬────────────┘
-                           │           │           │
-                      ┌────▼───┐  ┌────▼───┐  ┌───▼──────┐
-                      │MongoDB │  │ Redis  │  │ RabbitMQ │
-                      │  7     │  │   7    │  │    4     │
-                      │ :27017 │  │ :6379  │  │ :5672    │
-                      └────────┘  └────────┘  └──────────┘
+┌─────────────────┐     ┌──────────────────────────────────────────┐
+│   Frontend       │────▶│                 Backend                   │
+│  React 19        │◀────│           Express 5 + Socket.IO          │
+│  Zustand + Zod   │     │                                          │
+│  Axios           │     │  Controllers → Services → Repositories   │
+└─────────────────┘     └──────┬───────────┬───────────┬────────────┘
+                              │           │           │
+                         ┌────▼───┐  ┌────▼───┐  ┌───▼──────┐
+                         │MongoDB │  │ Redis  │  │ RabbitMQ │
+                         │  7     │  │   7    │  │    4     │
+                         │ :27017 │  │ :6379  │  │ :5672    │
+                         └────────┘  └────────┘  └──────────┘
 ```
 
 | Service | Role |
 |---------|------|
-| **Frontend** | React SPA — movie browsing, seat selection, booking UI |
+| **Frontend** | React SPA — movie browsing, seat selection, booking UI, admin dashboard |
 | **Backend** | REST API, WebSocket server, background expiration worker |
 | **MongoDB** | Primary data store (Users, Movies, Showtimes, Seats, Bookings, AuditLogs) |
 | **Redis** | Distributed lock for seat reservation (prevents double-booking) |
-| **RabbitMQ** | Async event queue for audit logging and notifications |
+| **RabbitMQ** | Async event queue for audit logging |
 
 ---
 
@@ -107,14 +108,12 @@ backend infrastructure processes.
 **Steps:**
 
 1. `ProtectedRoute` checks for valid JWT; redirects to `/login` if missing.
-2. Frontend fetches `GET /api/movies` on mount.
+2. `useMovies()` hook fetches `GET /api/movies` on mount.
 3. Movies displayed as a grid of `MovieCard` components, each showing:
    - Title
    - Description
    - Genre
 4. Clicking a card navigates to `/movies/:id`.
-
-**Optional:** Query params `?limit=&offset=` for pagination.
 
 ---
 
@@ -144,8 +143,8 @@ broadcasts, and database writes to prevent double-booking.
 **Steps:**
 
 1. Frontend joins a **Socket.IO room** for the showtime (`join` event).
-2. Frontend fetches `GET /api/showtimes/:showtimeId/seats` — returns all
-   seats (50 seats: rows A–E, columns 1–8).
+2. `useSeats()` hook fetches `GET /api/showtimes/:showtimeId/seats` — returns all
+   seats (40 seats: rows A–E, columns 1–8).
 3. **SeatMap** renders an 8-column grid with color-coded status:
 
    | Color | Status | Selectable? |
@@ -186,7 +185,7 @@ broadcasts, and database writes to prevent double-booking.
 
    d. Response returns `{ bookingId, seatNo }`.
 
-   e. Frontend shows **"Pay Now"** button with booking ID.
+   e. Frontend shows **BookingSummary** component with "Pay Now" button.
 
 5. **All other clients** receive `seat:locked` via WebSocket — their seat
    maps update in real-time (seat turns amber, unselectable).
@@ -195,7 +194,7 @@ broadcasts, and database writes to prevent double-booking.
 
 ### 6. Payment (Mock)
 
-**Entry point:** "Pay Now" button on booking page
+**Entry point:** "Pay Now" button in BookingSummary
 
 **Steps:**
 
@@ -217,6 +216,8 @@ broadcasts, and database writes to prevent double-booking.
    → compare owner to userId
    → DEL seat_lock:{showtimeId}:{seatNo}
    ```
+
+   f. **Publishes** `booking.success` event to RabbitMQ exchange.
 
 4. Frontend shows "Booking confirmed!" alert.
 5. Frontend resets booking state, navigates to Home.
@@ -264,6 +265,7 @@ A background worker runs inside the backend process as a `setInterval`.
    a. Update booking status → `EXPIRED`.
    b. Release Redis lock (`seat_lock:{showtimeId}:{seatNo}`).
    c. Broadcast `seat:released` via Socket.IO to the showtime room.
+   d. Publish `booking.timeout` to RabbitMQ exchange.
 3. All clients see the seat turn **green** (AVAILABLE) again.
 
 **Cleanup:** The worker returns a `clearInterval` function called during
@@ -293,19 +295,15 @@ An async event system for audit logging and (future) notifications.
 
 **Events published:**
 
-| Event | When | Status |
-|-------|------|--------|
-| `booking.success` | On confirmed payment | Not yet wired |
-| `booking.timeout` | On lock expiration | Not yet wired |
+| Event | When | Publisher |
+|-------|------|-----------|
+| `booking.success` | On confirmed payment | `booking.service.ts` → `payment()` |
+| `booking.timeout` | On lock expiration | `queue/worker.ts` → expiration timer |
 
 **Consumer behavior:**
 - Each message is saved as an `AuditLog` record (`event` = routing key, `data` = message content).
 - Messages ack'd on success, nack'd (no requeue) on failure.
 - If RabbitMQ is down, the app still starts — queue connection is async and non-blocking.
-
-> **Note:** The exchange and consumer are implemented, but the producer
-> (`booking.service.ts` / `worker.ts`) does not yet publish events.
-> Audit logging will work once publishing is wired.
 
 ---
 
@@ -323,8 +321,7 @@ page load, leave on navigation away.
 |-------|---------|---------|
 | `join` | `showtimeId` | Joins the room |
 | `leave` | `showtimeId` | Leaves the room |
-| `seat:select` | `{ showtimeId, seatNo, userId }` | Emitted but not handled server-side |
-| `seat:release` | `{ showtimeId, seatNo }` | Emitted but not handled server-side |
+| `seat:select` | `{ showtimeId, seatNo }` | Informational (booking handled via HTTP) |
 
 **Server → Client events (broadcast to room):**
 
@@ -396,7 +393,6 @@ Seat
 ├── status      SeatStatus @default(AVAILABLE)
 ├── version     Int      @default(0)
 ├── createdAt   DateTime @default(now())
-├── updatedAt   DateTime @updatedAt
 └── @@unique([showtimeId, seatNo])
 
 Booking
@@ -509,14 +505,14 @@ Admin ─────── Check req.user.role === ADMIN (admin routes only)
 Route Handler
   │
   ▼
-Error Handler ── Global catch, returns 500
+Error Handler ── Global catch (AppError → status code, else 500)
 ```
 
 ---
 
 ## Seed Data
 
-Running `npx prisma db seed` creates:
+Auto-seeded on first server start when database is empty:
 
 | Type | Data |
 |------|------|
@@ -524,16 +520,3 @@ Running `npx prisma db seed` creates:
 | **Showtimes** | 9 total — 3 per movie, each in Hall 1/2/3, different times, prices ($12.50, $14.50, $16.50) |
 | **Seats** | 40 per showtime — rows A–E × columns 1–8, all AVAILABLE |
 | **Admin** | `admin@cinema.com` / `admin123` (role: ADMIN) |
-
----
-
-## Not Yet Implemented
-
-| Feature | Status |
-|---------|--------|
-| RabbitMQ event publishing (`booking.success`, `booking.timeout`) | Exchange + consumer exist; producer not wired |
-| `seat:select` / `seat:release` Socket.IO server handlers | Frontend emits; no server-side handler |
-| Admin frontend panel | API ready, no UI |
-| Payment page | Simple "Pay Now" button only |
-| Booking history page | Not built |
-| Movie poster images | `posterUrl` set but no images served |

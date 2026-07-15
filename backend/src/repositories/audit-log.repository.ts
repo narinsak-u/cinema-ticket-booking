@@ -1,10 +1,7 @@
-import type { PrismaClient, AuditLog } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
+import type { IAuditLogRepository } from './interfaces.js'
 
-/** Repository interface for audit log data access. */
-export interface IAuditLogRepository {
-  create(data: { event: string; data: string }): Promise<AuditLog>
-  findAll(orderBy?: 'asc' | 'desc'): Promise<AuditLog[]>
-}
+export type { IAuditLogRepository }
 
 /**
  * Creates an audit log repository backed by Prisma.

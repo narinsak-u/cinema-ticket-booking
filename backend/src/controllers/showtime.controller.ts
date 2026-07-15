@@ -1,25 +1,21 @@
 import type { Request, Response } from 'express'
-import type { IShowtimeRepository } from '../repositories/showtime.repository.js'
+import type { createShowtimeService } from '../services/showtime.service.js'
 
 /**
  * Creates controller handlers for showtime endpoints.
- * Handles listing all showtimes and fetching a showtime by ID with optional pagination.
+ * Delegates to the showtime service for business logic.
  */
-export function createShowtimeController(showtimeRepo: IShowtimeRepository) {
+export function createShowtimeController(showtimeService: ReturnType<typeof createShowtimeService>) {
   return {
     async getAll(req: Request, res: Response) {
       const limit = req.query?.limit ? Number(req.query.limit) : undefined
       const offset = req.query?.offset ? Number(req.query.offset) : undefined
-      const showtimes = await showtimeRepo.findAll(limit, offset)
-      res.json({ success: true, data: showtimes })
+      const result = await showtimeService.getAll(limit, offset)
+      res.json(result)
     },
     async getById(req: Request, res: Response) {
-      const showtime = await showtimeRepo.findById(req.params.id as string)
-      if (!showtime) {
-        res.json({ success: false, error: 'Showtime not found' })
-        return
-      }
-      res.json({ success: true, data: showtime })
+      const result = await showtimeService.getById(req.params.id as string)
+      res.json(result)
     },
   }
 }

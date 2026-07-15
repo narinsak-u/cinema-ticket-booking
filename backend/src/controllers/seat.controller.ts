@@ -1,15 +1,15 @@
 import type { Request, Response } from 'express'
-import type { ISeatRepository } from '../repositories/seat.repository.js'
+import type { createSeatService } from '../services/seat.service.js'
 
 /**
  * Creates controller handlers for seat endpoints.
- * Handles fetching the seat map for a given showtime.
+ * Delegates to the seat service for business logic.
  */
-export function createSeatController(seatRepo: ISeatRepository) {
+export function createSeatController(seatService: ReturnType<typeof createSeatService>) {
   return {
     async getSeatMap(req: Request, res: Response) {
-      const seats = await seatRepo.findByShowtime(req.params.showtimeId as string)
-      res.json({ success: true, data: seats })
+      const result = await seatService.getSeatMap(req.params.showtimeId as string)
+      res.json(result)
     },
   }
 }

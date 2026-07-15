@@ -11,13 +11,16 @@ import { createUserRepository } from "./repositories/user.repository.js";
 import { createMovieRepository } from "./repositories/movie.repository.js";
 import { createAuthService } from "./services/auth.service.js";
 import { createAuthController } from "./controllers/auth.controller.js";
+import { createMovieService } from "./services/movie.service.js";
 import { createMovieController } from "./controllers/movie.controller.js";
 import { createAuthRoutes } from "./routes/auth.routes.js";
 import { createMovieRoutes } from "./routes/movie.routes.js";
 import { createShowtimeRepository } from "./repositories/showtime.repository.js";
+import { createShowtimeService } from "./services/showtime.service.js";
 import { createShowtimeController } from "./controllers/showtime.controller.js";
 import { createShowtimeRoutes } from "./routes/showtime.routes.js";
 import { createSeatRepository } from "./repositories/seat.repository.js";
+import { createSeatService } from "./services/seat.service.js";
 import { createSeatController } from "./controllers/seat.controller.js";
 import { createSeatRoutes } from "./routes/seat.routes.js";
 import { createBookingRepository } from "./repositories/booking.repository.js";
@@ -35,6 +38,7 @@ import { createAdminService } from "./services/admin.service.js";
 import { createAdminController } from "./controllers/admin.controller.js";
 import { createAdminRoutes } from "./routes/admin.routes.js";
 import { adminOnly } from "./middleware/admin.middleware.js";
+import { createQueueProducer } from "./queue/producer.js";
 
 /**
  * Creates an Express app with all middleware and routes wired.
@@ -70,17 +74,20 @@ export function createApp() {
   app.use("/api/auth", authRoutes);
 
   const movieRepo = createMovieRepository(prisma);
-  const movieController = createMovieController(movieRepo);
+  const movieService = createMovieService(movieRepo);
+  const movieController = createMovieController(movieService);
   const movieRoutes = createMovieRoutes(movieController);
 
   app.use("/api/movies", movieRoutes);
 
   const showtimeRepo = createShowtimeRepository(prisma);
-  const showtimeController = createShowtimeController(showtimeRepo);
+  const showtimeService = createShowtimeService(showtimeRepo);
+  const showtimeController = createShowtimeController(showtimeService);
   const showtimeRoutes = createShowtimeRoutes(showtimeController);
 
   const seatRepo = createSeatRepository(prisma);
-  const seatController = createSeatController(seatRepo);
+  const seatService = createSeatService(seatRepo);
+  const seatController = createSeatController(seatService);
   const seatRoutes = createSeatRoutes(seatController, authMiddleware);
 
   app.use("/api/showtimes", showtimeRoutes);
@@ -93,19 +100,14 @@ export function createApp() {
   const httpServer = createServer(app);
   const io = createSocketServer(httpServer);
 
-  // Mutable queue object — starts as no-op, wired to real RabbitMQ channel when connected
-  const queue: {
-    publish: (event: string, data: Record<string, unknown>) => void;
-  } = {
-    publish: () => {},
-  };
+  const producer = createQueueProducer();
 
   const bookingService = createBookingService(
     bookingRepo,
     seatRepo,
     redisLock,
     io,
-    (event, data) => queue.publish(event, data),
+    (event, data) => producer.publish(event, data),
   );
 
   const bookingController = createBookingController(bookingService);
@@ -130,20 +132,13 @@ export function createApp() {
     seatRepo,
     redisLock,
     io,
-    (event, data) => queue.publish(event, data),
+    (event, data) => producer.publish(event, data),
   );
 
   // ponytail: queue connects asynchronously; failed connection = no audit logging, app still starts
   connectQueue()
     .then(({ channel }) => {
-      queue.publish = (event, data) => {
-        channel.publish(
-          "booking.events",
-          event,
-          Buffer.from(JSON.stringify(data)),
-          { persistent: true },
-        );
-      };
+      producer.wire(channel);
       startConsumers(channel, auditLogRepo);
     })
     .catch((err) => console.error("Failed to connect to RabbitMQ:", err));

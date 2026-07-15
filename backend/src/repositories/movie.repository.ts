@@ -1,10 +1,7 @@
 import type { PrismaClient, Movie } from '@prisma/client'
+import type { IMovieRepository } from './interfaces.js'
 
-/** Repository interface for movie data access. */
-export interface IMovieRepository {
-  findAll(limit?: number, offset?: number): Promise<Movie[]>
-  findById(id: string): Promise<Movie | null>
-}
+export type { IMovieRepository }
 
 /**
  * Creates a movie repository backed by Prisma.
