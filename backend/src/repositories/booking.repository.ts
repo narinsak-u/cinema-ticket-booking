@@ -20,6 +20,12 @@ export function createBookingRepository(prisma: PrismaClient): IBookingRepositor
         include: { seat: true },
       })
     },
+    async findAll() {
+      return prisma.booking.findMany({
+        include: { seat: true, showtime: { include: { movie: true } } },
+        orderBy: { createdAt: 'desc' },
+      })
+    },
     async findByUser(userId: string) {
       return prisma.booking.findMany({
         where: { userId },

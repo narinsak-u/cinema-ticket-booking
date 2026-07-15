@@ -40,6 +40,7 @@ export interface IBookingRepository {
     status: string
   }): Promise<BookingWithSeatShowtime>
   findById(id: string): Promise<BookingWithSeat | null>
+  findAll(): Promise<BookingWithSeatShowtimeMovie[]>
   findByUser(userId: string): Promise<BookingWithSeatShowtimeMovie[]>
   findExpired(before: Date): Promise<BookingWithSeat[]>
   updateStatus(id: string, status: string, lockOwner?: string | null): Promise<Booking | null>

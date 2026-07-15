@@ -15,7 +15,9 @@ export function createAdminService(
       userId?: string;
       date?: string;
     }) {
-      const bookings = await bookingRepo.findByUser(filters.userId ?? "");
+      const bookings = filters.userId
+        ? await bookingRepo.findByUser(filters.userId)
+        : await bookingRepo.findAll();
       // ponytail: movieId and date filtering would need Prisma where clauses;
       // at this scale, client-side filter on the full result is simplest
       let filtered = bookings;
