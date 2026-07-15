@@ -1,6 +1,6 @@
 FROM node:22-alpine
 WORKDIR /app
-COPY package*.json ./
+COPY package*.json prisma.config.ts ./
 RUN npm install
 COPY prisma/ ./prisma/
 RUN npx prisma generate
