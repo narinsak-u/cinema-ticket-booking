@@ -6,6 +6,7 @@ import { createServer } from 'http'
 import { PrismaClient } from '@prisma/client'
 import { errorHandler } from './middleware/error.middleware.js'
 import { createAuthMiddleware } from './middleware/auth.middleware.js'
+import { seed } from '../prisma/seed.js'
 import { createUserRepository } from './repositories/user.repository.js'
 import { createMovieRepository } from './repositories/movie.repository.js'
 import { createAuthService } from './services/auth.service.js'
@@ -52,6 +53,14 @@ export function createApp() {
   app.use('/api/auth', limiter)
 
   const prisma = new PrismaClient()
+
+  prisma.movie.count().then((count) => {
+    if (count === 0) {
+      console.log('Database empty, seeding...')
+      seed(prisma).catch((err) => console.error('Seed failed:', err))
+    }
+  })
+
   const authMiddleware = createAuthMiddleware(env.JWT_SECRET)
   const userRepo = createUserRepository(prisma)
   const authService = createAuthService(userRepo, env.JWT_SECRET)

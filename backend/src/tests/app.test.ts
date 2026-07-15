@@ -1,10 +1,18 @@
 import { describe, it, expect, vi } from 'vitest'
 
-vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn().mockImplementation(() => ({
-    user: { findUnique: vi.fn(), create: vi.fn() },
-  })),
-}))
+vi.mock('@prisma/client', () => {
+  const mkModel = () => ({ findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), count: vi.fn().mockResolvedValue(1) })
+  return {
+    PrismaClient: vi.fn().mockImplementation(() => ({
+      user: mkModel(),
+      movie: mkModel(),
+      showtime: mkModel(),
+      seat: mkModel(),
+      booking: mkModel(),
+      auditLog: mkModel(),
+    })),
+  }
+})
 
 vi.mock('ioredis', () => {
   const mk = () => ({ set: vi.fn(), get: vi.fn(), del: vi.fn(), expire: vi.fn(), eval: vi.fn(), on: vi.fn() })
