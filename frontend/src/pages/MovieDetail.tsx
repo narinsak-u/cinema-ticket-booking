@@ -9,10 +9,10 @@ export function MovieDetail() {
   const [showtimes, setShowtimes] = useState<any[]>([])
 
   useEffect(() => {
-    api.get(`/api/movies/${id}`).then((res) => {
+    api.get(`/movies/${id}`).then((res) => {
       if (res.data.success) setMovie(res.data.data)
     })
-    api.get('/api/showtimes').then((res) => {
+    api.get('/showtimes').then((res) => {
       if (res.data.success) {
         const filtered = res.data.data.filter((s: any) => s.movieId === id)
         setShowtimes(filtered)

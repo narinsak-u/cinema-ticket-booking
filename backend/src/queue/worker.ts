@@ -16,6 +16,7 @@ export function startExpirationWorker(
   _seatRepo: ISeatRepository,
   redisLock: { release: (key: string, owner: string) => Promise<boolean> },
   io: Server,
+  publish?: (event: string, data: Record<string, unknown>) => void,
 ) {
   const timer = setInterval(async () => {
     const cutoff = new Date(Date.now() - LOCK_TTL_SECONDS * 1000);
@@ -30,6 +31,9 @@ export function startExpirationWorker(
       await redisLock.release(lockKey, booking.lockOwner ?? "");
       if (seatNo) {
         broadcastSeatReleased(io, showtimeId, seatNo);
+      }
+      if (publish) {
+        publish("booking.timeout", { bookingId: booking.id, showtimeId, seatNo });
       }
     }
   }, INTERVAL_MS);

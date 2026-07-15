@@ -15,7 +15,7 @@ export function Home() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    api.get('/api/movies').then((res) => {
+    api.get('/movies').then((res) => {
       if (res.data.success) setMovies(res.data.data)
     })
   }, [])

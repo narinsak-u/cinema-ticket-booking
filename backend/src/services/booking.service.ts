@@ -19,6 +19,7 @@ export function createBookingService(
     release: (key: string, owner: string) => Promise<boolean>;
   },
   io?: Server,
+  publish?: (event: string, data: Record<string, unknown>) => void,
 ) {
   return {
     async create(data: { userId: string; showtimeId: string; seatNo: string }) {
@@ -75,6 +76,10 @@ export function createBookingService(
           booking.seat.seatNo,
           userId,
         );
+      }
+
+      if (publish) {
+        publish("booking.success", { bookingId, userId, showtimeId: booking.showtimeId });
       }
 
       if (redisLock) {

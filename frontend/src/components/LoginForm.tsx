@@ -19,7 +19,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     e.preventDefault()
     setError('')
 
-    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login'
+    const endpoint = isRegister ? '/auth/register' : '/auth/login'
     const body = isRegister ? { email, password, name } : { email, password }
 
     try {
