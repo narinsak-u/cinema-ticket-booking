@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
+import type { IBookingRepository } from '../repositories/booking.repository.js'
+import type { IAuditLogRepository } from '../repositories/audit-log.repository.js'
 import { createAdminService } from '../services/admin.service.js'
 
 describe('AdminService', () => {
@@ -10,7 +12,7 @@ describe('AdminService', () => {
     updateStatus: vi.fn(),
   }
   const mockAuditLogRepo = { create: vi.fn(), findAll: vi.fn() }
-  const service = createAdminService(mockBookingRepo as any, mockAuditLogRepo as any)
+  const service = createAdminService(mockBookingRepo as unknown as IBookingRepository, mockAuditLogRepo as unknown as IAuditLogRepository)
 
   it('returns audit logs', async () => {
     mockAuditLogRepo.findAll.mockResolvedValue([{ id: '1', event: 'booking.success', data: '{}' }])

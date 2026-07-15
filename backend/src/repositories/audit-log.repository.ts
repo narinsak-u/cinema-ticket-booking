@@ -1,8 +1,8 @@
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, AuditLog } from '@prisma/client'
 
 export interface IAuditLogRepository {
-  create(data: { event: string; data: string }): Promise<unknown>
-  findAll(orderBy?: 'asc' | 'desc'): Promise<unknown[]>
+  create(data: { event: string; data: string }): Promise<AuditLog>
+  findAll(orderBy?: 'asc' | 'desc'): Promise<AuditLog[]>
 }
 
 export function createAuditLogRepository(prisma: PrismaClient): IAuditLogRepository {

@@ -1,8 +1,8 @@
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Seat } from '@prisma/client'
 
 export interface ISeatRepository {
-  findByShowtime(showtimeId: string): Promise<unknown[]>
-  updateStatus(id: string, status: string): Promise<unknown | null>
+  findByShowtime(showtimeId: string): Promise<Seat[]>
+  updateStatus(id: string, status: string): Promise<Seat | null>
 }
 
 export function createSeatRepository(prisma: PrismaClient): ISeatRepository {

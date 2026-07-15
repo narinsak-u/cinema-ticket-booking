@@ -8,7 +8,7 @@ describe('AuthController', () => {
     login: vi.fn(),
     getMe: vi.fn(),
   }
-  const controller = createAuthController(mockService as any)
+  const controller = createAuthController(mockService as unknown as Parameters<typeof createAuthController>[0])
 
   it('calls service.register on register', async () => {
     const req = { body: { email: 'test@test.com', password: 'password123', name: 'Test' } } as Request

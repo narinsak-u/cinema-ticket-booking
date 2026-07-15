@@ -14,8 +14,8 @@ describe('authMiddleware', () => {
     middleware(req, {} as Response, next)
 
     expect(next).toHaveBeenCalled()
-    expect((req as any).user).toBeDefined()
-    expect((req as any).user.id).toBe('user-1')
+    expect(req.user).toBeDefined()
+    expect(req.user!.id).toBe('user-1')
   })
 
   it('returns 401 without token', () => {

@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { IBookingRepository } from '../repositories/booking.repository.js'
+import type { ISeatRepository } from '../repositories/seat.repository.js'
 import { createBookingService } from '../services/booking.service.js'
 
 describe('Concurrency: 100 users booking 1 seat', () => {
@@ -30,7 +32,7 @@ describe('Concurrency: 100 users booking 1 seat', () => {
     }),
   }
 
-  const service = createBookingService(mockBookingRepo as any, mockSeatRepo as any, mockRedisLock as any)
+  const service = createBookingService(mockBookingRepo as unknown as IBookingRepository, mockSeatRepo as unknown as ISeatRepository, mockRedisLock as unknown as { acquire: (key: string, owner: string) => Promise<boolean>; release: (key: string, owner: string) => Promise<boolean> })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -41,7 +43,7 @@ describe('Concurrency: 100 users booking 1 seat', () => {
     mockSeatRepo.findByShowtime.mockResolvedValue([
       { id: 'seat-1', seatNo: 'A1', status: 'AVAILABLE' },
     ])
-    mockBookingRepo.create.mockImplementation(async (data: any) => ({
+    mockBookingRepo.create.mockImplementation(async (data: { userId: string; showtimeId: string; seatId: string; status: string }) => ({
       id: `booking-${data.userId}`,
       ...data,
     }))

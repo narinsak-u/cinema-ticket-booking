@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
+import type { IBookingRepository } from '../repositories/booking.repository.js'
+import type { ISeatRepository } from '../repositories/seat.repository.js'
 import { createBookingService } from '../services/booking.service.js'
 
 describe('BookingService', () => {
@@ -13,7 +15,7 @@ describe('BookingService', () => {
     findByShowtime: vi.fn(),
     updateStatus: vi.fn(),
   }
-  const service = createBookingService(mockBookingRepo as any, mockSeatRepo as any)
+  const service = createBookingService(mockBookingRepo as unknown as IBookingRepository, mockSeatRepo as unknown as ISeatRepository)
 
   it('creates a pending booking for available seat', async () => {
     mockSeatRepo.findByShowtime.mockResolvedValue([

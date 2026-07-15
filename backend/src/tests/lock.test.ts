@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import type { Redis } from 'ioredis'
 import { createRedisLock } from '../redis/client.js'
 
 describe('RedisLock', () => {
@@ -8,7 +9,7 @@ describe('RedisLock', () => {
     del: vi.fn(),
     expire: vi.fn(),
   }
-  const lock = createRedisLock(mockRedis as any, 300)
+  const lock = createRedisLock(mockRedis as unknown as Redis, 300)
 
   beforeEach(() => {
     vi.clearAllMocks()

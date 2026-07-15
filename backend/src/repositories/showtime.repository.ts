@@ -1,8 +1,10 @@
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Prisma } from '@prisma/client'
+
+export type ShowtimeWithMovie = Prisma.ShowtimeGetPayload<{ include: { movie: true } }>
 
 export interface IShowtimeRepository {
-  findAll(limit?: number, offset?: number): Promise<unknown[]>
-  findById(id: string): Promise<unknown | null>
+  findAll(limit?: number, offset?: number): Promise<ShowtimeWithMovie[]>
+  findById(id: string): Promise<ShowtimeWithMovie | null>
 }
 
 export function createShowtimeRepository(prisma: PrismaClient): IShowtimeRepository {
